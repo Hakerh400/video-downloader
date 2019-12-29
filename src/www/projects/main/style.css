@@ -1,0 +1,35 @@
+.section{
+  margin-bottom: 15px;
+}
+
+.section-title{
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.options{
+  padding-left: 12px;
+}
+
+.option{
+  display: block;
+}
+
+.option-desc{
+  width: 300px;
+  display: inline-block;
+}
+
+.option-value{
+  display: inline-block;
+  overflow: visible;
+}
+
+.option-str{
+  width: 500px;
+}
+
+.cmd-line{
+  font-family: monospace;
+}

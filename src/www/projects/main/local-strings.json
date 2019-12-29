@@ -1,0 +1,12 @@
+{
+  "sections": {
+    "basic": "Basic options",
+    "advanced": "Advanced options",
+    "cmdLine": "Command line"
+  },
+  "options": {
+    "url": "URL address",
+    "ffmpeg": "FFmpeg location",
+    "cmdLine": "Command line"
+  }
+}

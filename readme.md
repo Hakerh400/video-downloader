@@ -1,0 +1,1 @@
+This module provides a GUI for [youtube-dl](https://github.com/ytdl-org/youtube-dl) that can be run from browser.
