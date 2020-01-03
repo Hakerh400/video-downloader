@@ -1,0 +1,16 @@
+{
+  "sectsState": {
+    "basic": 1,
+    "advanced": 0,
+    "cmdLine": 0
+  },
+  "opts": {
+    "url": "",
+    "dest": "%userprofile%/Desktop",
+    "format": "bestvideo+bestaudio",
+    "outputPattern": "[%(uploader)s] %(title)s [%(id)s].%(ext)s",
+    "retries": "infinite",
+    "fragmentRetries": "infinite",
+    "ffmpeg": null
+  }
+}

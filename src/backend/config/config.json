@@ -1,5 +1,9 @@
 {
   "localIP": "127.0.0.1",
   "httpPort": "8081",
-  "ajaxPort": "8082"
+  "ajaxPort": "8082",
+  "deps": {
+    "youtube-dl": "https://raw.githubusercontent.com/Hakerh400/bin/master/youtube-dl.exe",
+    "ffmpeg": "https://raw.githubusercontent.com/Hakerh400/bin/master/ffmpeg.exe"
+  }
 }

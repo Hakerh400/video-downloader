@@ -7,8 +7,10 @@ const localPort = '8082';
 
 const LS = require('./local-strings');
 
+const reqSem = new O.Semaphore(1);
+
 const main = async () => {
-  O.addStyle('style.css');
+  O.addStyle(`/projects/${O.project}/style.css`);
 
   const content = O.ceDiv(O.body, 'content');
   const sectsElem = O.ceDiv(content, 'sections');
@@ -17,8 +19,8 @@ const main = async () => {
 
   let optsElem = null;
 
-  const opts = await req('getOpts');
   const sectsState = await req('getSectsState');
+  const opts = await req('getOpts');
 
   const addSect = name => {
     const sect = O.ce(sectsElem, 'details', 'section');
@@ -30,6 +32,13 @@ const main = async () => {
     O.ceText(title, LS.sections[name]);
 
     optsElem = O.ceDiv(sect, 'options');
+
+    O.ael(sect, 'toggle', () => {
+      req('updateSectState', {
+        name,
+        value: sect.open | 0,
+      }).catch(error);
+    });
   };
 
   const addOpt = name => {
@@ -39,7 +48,6 @@ const main = async () => {
     O.ceText(descElem, LS.options[name]);
 
     const val = O.ceDiv(elem, 'option-value');
-
     return val;
   };
 
@@ -52,44 +60,49 @@ const main = async () => {
 
     O.ael(input, 'change', evt => {
       opts[name] = input.value;
-      updateCmd();
+
+      req('updateOpt', {
+        name,
+        value: input.value,
+      }).then(updateCmd).catch(error);
     });
   };
 
-  addSect('basic');
-  addOptStr('url');
-  addOptStr('dest');
-  
-  addSect('advanced');
-  addOptStr('ffmpeg');
+  const addOpts = (title, opts) => {
+    addSect(title);
 
+    for(const opt of opts)
+      addOptStr(opt);
+  };
+
+  addOpts('basic', [
+    'url',
+    'dest',
+    'format',
+    'outputPattern',
+  ]);
+
+  addOpts('advanced', [
+    'retries',
+    'fragmentRetries',
+    'ffmpeg',
+  ]);
+  
   addSect('cmdLine');
   const cmdLine = addOpt('cmdLine');
   const cmdLineElem = O.ceDiv(cmdLine, 'pre');
   const cmdOpts = addOpt('cmdOpts');
   const cmdOptsElem = O.ceDiv(cmdOpts, 'pre');
-  
-  const updateCmd = () => {
-    const args = [];
 
-    args.push('youtube-dl');
-    args.push('--ffmpeg-location', opts.ffmpeg);
-    args.push(opts.url);
+  const updateCmd = () => req('getCmdData').then(data => {
+    cmdLineElem.innerText = data.cmdLine;
+    cmdOptsElem.innerText = data.cmdOpts;
+  });
 
-    cmdLineElem.innerText = args.map(arg => {
-      if(arg === '' || /[^a-zA-Z0-9\-_]/.test(arg)) arg = `"${arg}"`;
-      return arg;
-    }).join(' ');
-
-    cmdOptsElem.innerText = JSON.stringify({
-      cwd: opts.dest,
-    });
-  };
-
-  updateCmd();
+  await updateCmd();
 };
 
-const req = (type, data) => new Promise((res, rej) => {
+const req = (type, data=null) => reqSem.wait().then(() => new Promise((res, rej) => {
   const xhr = new XMLHttpRequest();
 
   xhr.onreadystatechange = () => {
@@ -108,6 +121,10 @@ const req = (type, data) => new Promise((res, rej) => {
 
   xhr.open('POST', `http://${localIP}:${localPort}/`);
   xhr.send(JSON.stringify({type, data}));
-});
+})).finally(() => reqSem.signal());
 
-main();
+const error = err => {
+  O.error(err);
+};
+
+main().catch(error);

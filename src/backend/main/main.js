@@ -8,6 +8,7 @@ const O = require('../omikron');
 const config = require('../config');
 const readline = require('../readline');
 const system = require('../system');
+const data = require('../data');
 const ajax = require('./ajax');
 
 const frontendDir = path.join(config.dirs.root, 'src/frontend');
@@ -25,7 +26,7 @@ const main = async () => {
 
   log.inc('Initializing system');
   await system.init();
-  log.dec('System initialized successfully');
+  log.dec('System is initialized');
 
   log.inc('Creating static HTTP server');
   httpServer = http.createServer(onHttpReq);
@@ -39,9 +40,9 @@ const main = async () => {
 
   log.inc('Starting readline interface');
   rl = readline.rl();
-  log.dec('Redline interface created successfully');
+  log.dec('Readline interface is created');
 
-  log.inc('Application is ready to use');
+  log('Application is ready to use');
 
   askForInput();
 };
@@ -61,12 +62,24 @@ const onInput = async str => {
   if(str === '') return;
 
   if(/^q$/i.test(str)){
-    httpServer.close();
-    ajaxServer.close();
+    log.inc('Preparing to close application');
+
+    log.inc('Closing readline interface');
     rl.close();
-    httpServer = null;
-    ajaxServer = null;
     rl = null;
+    log.dec('Readline interface is closed');
+
+    log.inc('Closing static HTTP server');
+    httpServer.close();
+    httpServer = null;
+    log.dec('Server is closed');
+
+    log.inc('Closing AJAX server');
+    ajaxServer.close();
+    ajaxServer = null;
+    log.dec('Server is closed');
+
+    log.dec('Terminating the process');
     return;
   }
 
@@ -124,16 +137,18 @@ const onAjaxReq = (req, res) => {
     const {type, data} = json;
     const result = {data: null, err: null};
 
+    log.inc(`Request: ${JSON.stringify(json)}`);
+
     ajax[type](data).then(data => {
-      result.data = data;
+      if(data !== undefined)
+        result.data = data;
     }, err => {
-      if(typeof err !== 'string'){
-        result.err = serverError;
-        return;
-      }
+      if(typeof err !== 'string')
+        error(err);
 
       result.err = err;
     }).finally(() => {
+      log.dec(`Response: ${JSON.stringify(result)}`);
       res.end(JSON.stringify(result));
     });
   });
@@ -144,4 +159,9 @@ const setHeaders = res => {
   res.setHeader('Access-Control-Allow-Headers', 'x-requested-with');
 };
 
-main().catch(log);
+const error = err => {
+  process.exitCode = 1;
+  O.exit(err);
+};
+
+main().catch(error);
