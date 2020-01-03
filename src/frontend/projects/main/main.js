@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('!/backend/config');
+const config = require('@/src/backend/config');
 
 const localIP = '127.0.0.1';
 const localPort = '8082';
@@ -17,11 +17,14 @@ const main = async () => {
 
   let optsElem = null;
 
-  const addSect = (name, open=0) => {
+  const opts = await req('getOpts');
+  const sectsState = await req('getSectsState');
+
+  const addSect = name => {
     const sect = O.ce(sectsElem, 'details', 'section');
 
     sects[name] = sect;
-    if(open) sect.open = 1;
+    if(sectsState[name]) sect.open = 1;
 
     const title = O.ce(sect, 'summary', 'section-title');
     O.ceText(title, LS.sections[name]);
@@ -53,17 +56,18 @@ const main = async () => {
     });
   };
 
-  const opts = await req('getOpts');
-
-  addSect('basic', 1);
+  addSect('basic');
   addOptStr('url');
+  addOptStr('dest');
   
   addSect('advanced');
   addOptStr('ffmpeg');
 
   addSect('cmdLine');
   const cmdLine = addOpt('cmdLine');
-  const cmdElem = O.ceDiv(cmdLine, 'cmd-line');
+  const cmdLineElem = O.ceDiv(cmdLine, 'pre');
+  const cmdOpts = addOpt('cmdOpts');
+  const cmdOptsElem = O.ceDiv(cmdOpts, 'pre');
   
   const updateCmd = () => {
     const args = [];
@@ -72,10 +76,14 @@ const main = async () => {
     args.push('--ffmpeg-location', opts.ffmpeg);
     args.push(opts.url);
 
-    cmdElem.innerText = args.map(arg => {
+    cmdLineElem.innerText = args.map(arg => {
       if(arg === '' || /[^a-zA-Z0-9\-_]/.test(arg)) arg = `"${arg}"`;
       return arg;
     }).join(' ');
+
+    cmdOptsElem.innerText = JSON.stringify({
+      cwd: opts.dest,
+    });
   };
 
   updateCmd();

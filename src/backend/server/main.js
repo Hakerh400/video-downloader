@@ -7,27 +7,53 @@ const querystring = require('querystring');
 const O = require('../omikron');
 const config = require('../config');
 const readline = require('../readline');
+const system = require('../system');
 const ajax = require('./ajax');
 
-const cwd = __dirname;
-const rootDir = path.join(cwd, '../../frontend');
+const frontendDir = path.join(config.dirs.root, 'src/frontend');
 
 let httpServer = null;
 let ajaxServer = null;
 let rl = null;
 
-const main = () => {
+const main = async () => {
+  log('Process started');
+
+  log.inc('Checking for updates');
+  await system.update();
+  log.dec('Application is up-to-date');
+
+  log.inc('Initializing system');
+  await system.init();
+  log.dec('System initialized successfully');
+
+  log.inc('Creating static HTTP server');
   httpServer = http.createServer(onHttpReq);
   httpServer.listen(config.httpPort);
+  log.dec(`Server is listening on port ${config.httpPort}`);
 
+  log.inc('Creating AJAX server');
   ajaxServer = http.createServer(onAjaxReq);
   ajaxServer.listen(config.ajaxPort);
+  log.dec(`Server is listening on port ${config.ajaxPort}`);
 
+  log.inc('Starting readline interface');
   rl = readline.rl();
-  rl.on('line', onInput);
+  log.dec();
+
+  askForInput();
 };
 
-const onInput = str => {
+const askForInput = () => {
+  rl.question('', str => {
+    (async () => {
+      await onInput(str);
+      if(rl !== null) askForInput();
+    })().catch(log);
+  });
+};
+
+const onInput = async str => {
   str = str.trim();
 
   if(str === '') return;
@@ -49,7 +75,11 @@ const onHttpReq = (req, res) => {
   setHeaders(res);
 
   const url = new URL(`http://localhost${req.url}`);
-  const urlPath = url.pathname.replace(/!/g, '..');
+  const urlPath = url.pathname.slice(1);
+
+  const pth = urlPath.startsWith('@') ?
+    path.join(config.dirs.root, urlPath.slice(1)) :
+    path.join(frontendDir, urlPath);
 
   const e404 = () => {
     res.statusCode = 404;
@@ -70,8 +100,14 @@ const onHttpReq = (req, res) => {
     return send(path.join(pth, 'index.htm'));
   };
 
-  const pth = path.join(rootDir, urlPath);
-  if(!send(pth)) e404();
+  const found = send(pth);
+  if(!found) e404();
+
+  log('GET', JSON.stringify([
+    req.url,
+    pth,
+    res.statusCode,
+  ]));
 };
 
 const onAjaxReq = (req, res) => {
@@ -106,4 +142,4 @@ const setHeaders = res => {
   res.setHeader('Access-Control-Allow-Headers', 'x-requested-with');
 };
 
-main();
+main().catch(log);

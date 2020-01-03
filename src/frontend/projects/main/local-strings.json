@@ -6,7 +6,9 @@
   },
   "options": {
     "url": "URL address",
+    "dest": "Destination",
     "ffmpeg": "FFmpeg location",
-    "cmdLine": "Command line"
+    "cmdLine": "Command line",
+    "cmdOpts": "Options"
   }
 }

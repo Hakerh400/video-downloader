@@ -31,6 +31,7 @@
   width: 500px;
 }
 
-.cmd-line{
+.pre{
   font-family: monospace;
+  white-space: pre;
 }
