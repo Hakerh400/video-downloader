@@ -10,7 +10,7 @@ const readline = require('../readline');
 const ajax = require('./ajax');
 
 const cwd = __dirname;
-const rootDir = path.join(cwd, '../../www');
+const rootDir = path.join(cwd, '../../frontend');
 
 let httpServer = null;
 let ajaxServer = null;

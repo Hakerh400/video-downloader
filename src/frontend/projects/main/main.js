@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('!/node/config');
+const config = require('!/backend/config');
 
 const localIP = '127.0.0.1';
 const localPort = '8082';
@@ -17,10 +17,13 @@ const main = async () => {
 
   let optsElem = null;
 
-  const addSect = name => {
-    const sect = O.ceDiv(sectsElem, 'section');
+  const addSect = (name, open=0) => {
+    const sect = O.ce(sectsElem, 'details', 'section');
 
-    const title = O.ceDiv(sect, 'section-title');
+    sects[name] = sect;
+    if(open) sect.open = 1;
+
+    const title = O.ce(sect, 'summary', 'section-title');
     O.ceText(title, LS.sections[name]);
 
     optsElem = O.ceDiv(sect, 'options');
@@ -52,7 +55,7 @@ const main = async () => {
 
   const opts = await req('getOpts');
 
-  addSect('basic');
+  addSect('basic', 1);
   addOptStr('url');
   
   addSect('advanced');
