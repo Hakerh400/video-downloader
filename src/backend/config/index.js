@@ -11,6 +11,6 @@ dirs.root = path.join(cwd, '../../..');
 dirs.data = path.join(dirs.root, 'data');
 
 config.package = require(path.join(dirs.root, 'package.json'));
-config.updateScript = path.join(config.package.homepage, 'update.js');
+config.updateScript = 'https://raw.githubusercontent.com/Hakerh400/video-downloader/master/update.js';
 
 module.exports = config;

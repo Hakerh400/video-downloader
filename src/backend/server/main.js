@@ -17,7 +17,7 @@ let ajaxServer = null;
 let rl = null;
 
 const main = async () => {
-  log('Process started');
+  log(`Video downloader version ${config.package.version}`);
 
   log.inc('Checking for updates');
   await system.update();
@@ -39,7 +39,9 @@ const main = async () => {
 
   log.inc('Starting readline interface');
   rl = readline.rl();
-  log.dec();
+  log.dec('Redline interface created successfully');
+
+  log.inc('Application is ready to use');
 
   askForInput();
 };

@@ -1,5 +1,5 @@
 'use strict';
 
 module.exports = async () => {
-  return 0;
+  return 'no updates available';
 };
