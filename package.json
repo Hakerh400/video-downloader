@@ -1,7 +1,7 @@
 {
   "name": "@hakerh400/video-downloader",
   "description": "Video downloader",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Thomas <hakerh403@gmail.com>",
   "main": "index.js",
   "contributors": [],

@@ -20,6 +20,8 @@ let rl = null;
 let exitFlag = 0;
 
 const main = async () => {
+  process.on('uncaughtException', error);
+  
   log(`Video downloader version ${config.package.version}`);
 
   log.inc('Checking for updates');
@@ -77,9 +79,15 @@ const onHttpReq = (req, res) => {
   const url = new URL(`http://localhost${req.url}`);
   const urlPath = url.pathname.slice(1);
 
-  const pth = urlPath.startsWith('@') ?
+  let pth = urlPath.startsWith('@') ?
     path.join(config.dirs.root, urlPath.slice(1)) :
     path.join(frontendDir, urlPath);
+
+  const index1 = pth.indexOf('node_modules');
+  const index2 = pth.lastIndexOf('node_modules');
+
+  if(index1 !== index2)
+    pth = pth.slice(0, index1) + pth.slice(index2);
 
   const e404 = () => {
     res.statusCode = 404;
