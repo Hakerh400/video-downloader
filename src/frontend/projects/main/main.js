@@ -16,6 +16,7 @@ const main = async () => {
   const sectsElem = O.ceDiv(content, 'sections');
 
   const sects = O.obj();
+  const optsElems = O.obj();
 
   let optsElem = null;
 
@@ -24,7 +25,6 @@ const main = async () => {
 
   const addSect = name => {
     const sect = O.ce(sectsElem, 'details', 'section');
-
     sects[name] = sect;
     if(sectsState[name]) sect.open = 1;
 
@@ -43,6 +43,7 @@ const main = async () => {
 
   const addOpt = name => {
     const elem = O.ceDiv(optsElem, 'option');
+    optsElems[name] = elem;
 
     const descElem = O.ceDiv(elem, 'option-desc');
     O.ceText(descElem, LS.options[name]);
@@ -60,11 +61,7 @@ const main = async () => {
 
     O.ael(input, 'change', evt => {
       opts[name] = input.value;
-
-      req('updateOpt', {
-        name,
-        value: input.value,
-      }).then(updateCmd).catch(error);
+      updateOpt(name, input.value).catch(error);
     });
   };
 
@@ -75,6 +72,10 @@ const main = async () => {
       addOptStr(opt);
   };
 
+  const updateOpt = (name, value) => {
+    return req('updateOpt', {name, value}).then(updateCmd);
+  };
+
   addOpts('basic', [
     'url',
     'dest',
@@ -83,9 +84,10 @@ const main = async () => {
   ]);
 
   addOpts('advanced', [
+    'youtube-dl',
+    'ffmpeg',
     'retries',
     'fragmentRetries',
-    'ffmpeg',
   ]);
   
   addSect('cmdLine');
@@ -95,11 +97,31 @@ const main = async () => {
   const cmdOptsElem = O.ceDiv(cmdOpts, 'pre');
 
   const updateCmd = () => req('getCmdData').then(data => {
-    cmdLineElem.innerText = data.cmdLine;
-    cmdOptsElem.innerText = data.cmdOpts;
+    cmdLineElem.innerText = [data.exe, ...data.args].map(arg => {
+      if(arg === '' || /[^a-zA-Z0-9\-_]/.test(arg)) arg = `"${arg}"`;
+      return arg;
+    }).join(' ');
+
+    cmdOptsElem.innerText = JSON.stringify(data.options);
   });
 
-  await updateCmd();
+  updateCmd().catch(error);
+
+  const btns = O.obj();
+  const btnsElem = O.ceDiv(content, 'buttons');
+
+  const addBtn = (name, listener) => {
+    const btn = O.ce(btnsElem, 'button', 'button');
+    btns[name] = btn;
+
+    O.ceText(btn, LS.buttons[name]);
+    O.ael(btn, 'click', listener);
+  };
+
+  addBtn('download', () => {
+    O.qs(optsElems.url, 'input').value = '';
+    req('download').then(() => updateOpt('url', '')).catch(error);
+  });
 };
 
 const req = (type, data=null) => reqSem.wait().then(() => new Promise((res, rej) => {

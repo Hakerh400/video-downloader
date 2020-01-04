@@ -3,7 +3,7 @@
 }
 
 .section-title{
-  width: 300px;
+  width: 250px;
   font-weight: bold;
   font-size: 20px;
   margin-bottom: 10px;
@@ -19,7 +19,8 @@
 }
 
 .option-desc{
-  width: 300px;
+  vertical-align: top;
+  width: 250px;
   display: inline-block;
 }
 
@@ -29,10 +30,14 @@
 }
 
 .option-str{
-  width: 500px;
+  width: 700px;
 }
 
 .pre{
+  width: 700px;
   font-family: monospace;
-  white-space: pre;
+}
+
+.button{
+  display: block;
 }

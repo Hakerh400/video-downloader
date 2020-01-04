@@ -9,8 +9,9 @@
     "dest": "%userprofile%/Desktop",
     "format": "bestvideo+bestaudio",
     "outputPattern": "[%(uploader)s] %(title)s [%(id)s].%(ext)s",
+    "youtube-dl": null,
+    "ffmpeg": null,
     "retries": "infinite",
-    "fragmentRetries": "infinite",
-    "ffmpeg": null
+    "fragmentRetries": "infinite"
   }
 }

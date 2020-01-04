@@ -148,8 +148,9 @@ const onAjaxReq = (req, res) => {
 
       result.err = err;
     }).finally(() => {
-      log.dec(`Response: ${JSON.stringify(result)}`);
-      res.end(JSON.stringify(result));
+      const str = JSON.stringify(result);
+      log.dec(`Response: ${str}`);
+      res.end(str);
     });
   });
 };

@@ -11,8 +11,12 @@
     "outputPattern": "Output file pattern",
     "retries": "Retries",
     "fragmentRetries": "Fragment retries",
+    "youtube-dl": "YoutubeDL location",
     "ffmpeg": "FFmpeg location",
     "cmdLine": "Command line",
     "cmdOpts": "Options"
+  },
+  "buttons": {
+    "download": "Download"
   }
 }
