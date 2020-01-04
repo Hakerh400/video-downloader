@@ -122,6 +122,11 @@ const main = async () => {
     O.qs(optsElems.url, 'input').value = '';
     req('download').then(() => updateOpt('url', '')).catch(error);
   });
+
+  addBtn('exit', () => {
+    O.body.innerText = '';
+    req('exit').catch(error);
+  });
 };
 
 const req = (type, data=null) => reqSem.wait().then(() => new Promise((res, rej) => {
@@ -129,8 +134,15 @@ const req = (type, data=null) => reqSem.wait().then(() => new Promise((res, rej)
 
   xhr.onreadystatechange = () => {
     if(xhr.readyState === 4){
-      if(xhr.status !== 200)
-        return rej(new Error(`Status code ${xhr.status}`));
+      const {status} = xhr;
+
+      if(status !== 200){
+        return rej(new Error(
+          status === 0 ?
+          'Server is offline' :
+          `Status code ${status}`
+        ));
+      }
 
       const json = JSON.parse(xhr.responseText);
 

@@ -5,6 +5,7 @@ const path = require('path');
 const cp = require('child_process');
 const O = require('../omikron');
 const data = require('../data');
+const app = require('./main');
 
 const {sectsState, opts} = data;
 
@@ -77,6 +78,10 @@ const ajax = {
     proc.on('exit', exitCode => {
       logProc(`exited with code: ${exitCode}`);
     });
+  },
+
+  async exit(){
+    app.exit();
   },
 };
 

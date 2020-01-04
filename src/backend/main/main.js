@@ -17,6 +17,8 @@ let httpServer = null;
 let ajaxServer = null;
 let rl = null;
 
+let exitFlag = 0;
+
 const main = async () => {
   log(`Video downloader version ${config.package.version}`);
 
@@ -62,24 +64,7 @@ const onInput = async str => {
   if(str === '') return;
 
   if(/^q$/i.test(str)){
-    log.inc('Preparing to close application');
-
-    log.inc('Closing readline interface');
-    rl.close();
-    rl = null;
-    log.dec('Readline interface is closed');
-
-    log.inc('Closing static HTTP server');
-    httpServer.close();
-    httpServer = null;
-    log.dec('Server is closed');
-
-    log.inc('Closing AJAX server');
-    ajaxServer.close();
-    ajaxServer = null;
-    log.dec('Server is closed');
-
-    log.dec('Terminating the process');
+    exit();
     return;
   }
 
@@ -160,9 +145,39 @@ const setHeaders = res => {
   res.setHeader('Access-Control-Allow-Headers', 'x-requested-with');
 };
 
+const exit = () => {
+  if(exitFlag){
+    log('Ignoring exit request, because exit flag is 1');
+    return;
+  }
+
+  log.inc('Preparing to close application');
+  exitFlag = 1;
+
+  log.inc('Closing readline interface');
+  rl.close();
+  rl = null;
+  log.dec('Readline interface is closed');
+
+  log.inc('Closing static HTTP server');
+  httpServer.close();
+  httpServer = null;
+  log.dec('Server is closed');
+
+  log.inc('Closing AJAX server');
+  ajaxServer.close();
+  ajaxServer = null;
+  log.dec('Server is closed');
+
+  log.dec('Terminating the process');
+  return;
+};
+
 const error = err => {
   process.exitCode = 1;
   O.exit(err);
 };
 
 main().catch(error);
+
+module.exports.exit = exit;

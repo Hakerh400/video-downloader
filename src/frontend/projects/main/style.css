@@ -16,6 +16,7 @@
 
 .option{
   display: block;
+  margin-bottom: 5px;
 }
 
 .option-desc{
@@ -40,4 +41,5 @@
 
 .button{
   display: block;
+  margin: 8px 0px;
 }

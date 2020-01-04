@@ -17,6 +17,7 @@
     "cmdOpts": "Options"
   },
   "buttons": {
-    "download": "Download"
+    "download": "Download",
+    "exit": "Close server"
   }
 }
