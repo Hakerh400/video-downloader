@@ -5,8 +5,15 @@ const path = require('path');
 const https = require('https');
 const O = require('../omikron');
 
+const DISABLE_CACHE = 1;
+
 const download = (url, pth=null) => new Promise((res, rej) => {
   log.inc('Downloading', JSON.stringify([url, pth]));
+
+  if(DISABLE_CACHE){
+    url = `${url}${url.includes('?') ? '&' : '?'}${genRandParam()}`;
+    log(`Changed URL to ${O.sf(url)} in order to disable cache`);
+  }
 
   let file = null;
 
@@ -53,5 +60,13 @@ const download = (url, pth=null) => new Promise((res, rej) => {
     response.on('error', rej);
   }).on('error', rej);
 });
+
+const genRandParam = () => {
+  return O.ca(2, () => genRandStr()).join('=');
+};
+
+const genRandStr = () => {
+  return O.randBuf(10).toString('hex');
+};
 
 module.exports = download;

@@ -14,7 +14,7 @@ const startBatOld = path.join(startDir, 'start.bat');
 const startBatNew = path.join(mainDir, 'start.bat');
 
 module.exports = async () => {
-  const batContent = O.rfs(startBatNew);
-  O.wfs(startBatOld);
-  return 'updated';
+  // const batContent = O.rfs(startBatNew);
+  // O.wfs(startBatOld);
+  return '...';
 };
