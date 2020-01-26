@@ -5,6 +5,8 @@ const path = require('path');
 const https = require('https');
 const O = require('../omikron');
 
+// TODO: Cache-Control: no-cache
+
 const DISABLE_CACHE = 1;
 
 const download = (url, pth=null) => new Promise((res, rej) => {
